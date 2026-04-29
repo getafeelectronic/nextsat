@@ -1,7 +1,7 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useRef, useCallback } from 'react'
-import { usePathname, useSearchParams } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { supabase } from '../lib/supabase'
 
 /**
@@ -16,9 +16,14 @@ import { supabase } from '../lib/supabase'
  */
 const useAnalytics = () => {
   const pathname = usePathname()
-  const searchParams = useSearchParams()
   const pageLoadTime = useRef(0)
   const hasTrackedPageview = useRef(false)
+
+  const getCurrentPage = () => {
+    if (typeof window === 'undefined') return pathname
+    const query = window.location.search
+    return query ? `${pathname}${query}` : pathname
+  }
 
   const getDeviceType = () => {
     if (typeof window === 'undefined') return 'unknown'
@@ -82,8 +87,7 @@ const useAnalytics = () => {
 
   const trackPageview = useCallback(async () => {
     const geolocation = getGeolocation()
-    const query = searchParams?.toString()
-    const currentPage = query ? `${pathname}?${query}` : pathname
+    const currentPage = getCurrentPage()
 
     await sendEvent({
       event_type: 'pageview',
@@ -98,12 +102,11 @@ const useAnalytics = () => {
       language: typeof navigator !== 'undefined' ? navigator.language : '',
       ...geolocation
     })
-  }, [pathname, searchParams])
+  }, [pathname])
 
   const trackDuration = useCallback(async () => {
     const duration = Math.round((Date.now() - pageLoadTime.current) / 1000)
-    const query = searchParams?.toString()
-    const currentPage = query ? `${pathname}?${query}` : pathname
+    const currentPage = getCurrentPage()
 
     if (duration >= 3) {
       await sendEvent({
@@ -113,11 +116,10 @@ const useAnalytics = () => {
         device: getDeviceType()
       })
     }
-  }, [pathname, searchParams])
+  }, [pathname])
 
   const trackFormSubmit = async (formType, formData = {}) => {
-    const query = searchParams?.toString()
-    const currentPage = query ? `${pathname}?${query}` : pathname
+    const currentPage = getCurrentPage()
 
     await sendEvent({
       event_type: 'form_submit',
@@ -129,8 +131,7 @@ const useAnalytics = () => {
   }
 
   const trackConversion = async (conversionType, details = {}) => {
-    const query = searchParams?.toString()
-    const currentPage = query ? `${pathname}?${query}` : pathname
+    const currentPage = getCurrentPage()
 
     await sendEvent({
       event_type: 'conversion',
@@ -142,8 +143,7 @@ const useAnalytics = () => {
   }
 
   const trackClick = async (elementName, elementType = 'button') => {
-    const query = searchParams?.toString()
-    const currentPage = query ? `${pathname}?${query}` : pathname
+    const currentPage = getCurrentPage()
 
     await sendEvent({
       event_type: 'click',
@@ -166,7 +166,7 @@ const useAnalytics = () => {
         trackDuration()
       }
     }
-  }, [pathname, searchParams, trackPageview, trackDuration])
+  }, [pathname, trackPageview, trackDuration])
 
   return {
     trackFormSubmit,
@@ -179,3 +179,4 @@ const useAnalytics = () => {
 }
 
 export default useAnalytics
+
