@@ -27,7 +27,7 @@ export const metadata = {
   },
   description:
     'Servicio técnico especializado en reparación de televisores en Getafe. Diagnóstico gratuito y garantía en todas nuestras reparaciones.',
-  metadataBase: new URL('https://getafeelectronic.github.io/miserviciotecnico'),
+  metadataBase: new URL('https://getafeelectronic.github.io/nextsat'),
 }
 
 export default function RootLayout({ children }) {

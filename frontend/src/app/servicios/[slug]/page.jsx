@@ -1,5 +1,25 @@
 import ServicioDetalleClient from '@/pages/ServicioDetalle'
-import { getServiceBySlug } from '@/lib/supabase'
+import { getServiceBySlug, getServices } from '@/lib/supabase'
+
+const fallbackServiceSlugs = [
+  'reparacion-tv-lcd-led',
+  'reparacion-tv-plasma',
+  'garantia-incluida',
+  'diagnostico-gratuito',
+  'reparacion-monitores',
+  'venta-repuestos',
+]
+
+export async function generateStaticParams() {
+  const services = await getServices()
+  if (services && services.length > 0) {
+    return services
+      .filter((service) => service?.slug)
+      .map((service) => ({ slug: service.slug }))
+  }
+
+  return fallbackServiceSlugs.map((slug) => ({ slug }))
+}
 
 export async function generateMetadata({ params }) {
   const service = await getServiceBySlug(params.slug)
