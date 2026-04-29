@@ -1,0 +1,4 @@
+User-Agent: *
+Allow: /
+
+Sitemap: https://getafeelectronic.github.io/nextsat/sitemap.xml
