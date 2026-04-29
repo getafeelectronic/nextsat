@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import {
   Tv, Monitor, Wrench, BadgeCheck, Search, Package,
   Settings, Zap, Shield, DollarSign, Clock, Phone, ArrowLeft
@@ -15,8 +15,8 @@ import useAnalytics from '@/hooks/useAnalytics'
 const iconMap = { Tv, Monitor, Wrench, BadgeCheck, Search, Package, Settings, Zap, Shield, DollarSign, Clock, Phone }
 
 export default function ServicioDetalle() {
-  const { slug } = useParams()
-  const router = useRouter()
+  const params = useParams()
+  const slug = params?.slug
   const [service, setService] = useState(null)
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
@@ -24,6 +24,12 @@ export default function ServicioDetalle() {
   useAnalytics()
 
   useEffect(() => {
+    if (!slug) {
+      setNotFound(true)
+      setLoading(false)
+      return
+    }
+
     async function loadService() {
       setLoading(true)
       setNotFound(false)
